@@ -21,5 +21,3 @@ include(../../src/common/common.pri)
 SOURCES += main.cpp    \
            tst_test_eigen.cpp
 
-DISTFILES += \
-    Readme.md
