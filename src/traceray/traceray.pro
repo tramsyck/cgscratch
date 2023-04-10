@@ -12,10 +12,16 @@ CONFIG += c++17
 include(../common/common.pri)
 message($${INCLUDEPATH})
 SOURCES += \
-    traceray.cpp
+    canvas.cpp \
+    scene.cpp \
+    tools.cpp \
+    viewport.cpp
 
 HEADERS += \
-    traceray.h
+    canvas.h \
+    scene.h \
+    tools.h \
+    viewport.h
 
 # Default rules for deployment.
 unix {
