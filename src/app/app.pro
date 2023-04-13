@@ -17,7 +17,7 @@ SOURCES += \
 HEADERS += \
     mainwindow.h
 
-LIBS += ../traceray/libtraceray.a
+LIBS += ../traceray/debug/traceray.lib
 
 FORMS += \
     mainwindow.ui

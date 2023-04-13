@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <QtGui/QColor>
-
+#include <light.h>
 struct Sphere {
     Sphere() { }
     int radius;
@@ -27,9 +27,14 @@ public:
     {
         return _objects;
     }
+    std::vector<std::shared_ptr<Light>> getLights() const
+    {
+        return _lights;
+    }
 
 private:
     std::vector<std::shared_ptr<Sphere>> _objects;
+    std::vector<std::shared_ptr<Light>> _lights;
 };
 
 #endif // SCENE_H

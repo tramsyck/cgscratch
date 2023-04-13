@@ -13,12 +13,14 @@ include(../common/common.pri)
 message($${INCLUDEPATH})
 SOURCES += \
     canvas.cpp \
+    light.cpp \
     scene.cpp \
     tools.cpp \
     viewport.cpp
 
 HEADERS += \
     canvas.h \
+    light.h \
     scene.h \
     tools.h \
     viewport.h
