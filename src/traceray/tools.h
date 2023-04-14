@@ -12,7 +12,7 @@ Vector3d CanvasToViewport(const Vector2d& pt, const Canvas& canvas, float viewpo
     return { x, y, viewport_size };
 }
 
-double ComputeLighting(const Vector3d& point, const Vector3d& normal, const Scene& scene)
+double ComputeLighting(const Vector3d& point, const Vector3d& normal, const Vector3d& v, double s, const Scene& scene)
 {
     double intensity = 0.0;
     for (int i = 0; i < scene.getLights().size(); i++) {
@@ -31,6 +31,14 @@ double ComputeLighting(const Vector3d& point, const Vector3d& normal, const Scen
             auto n_dotl = normal.dot(vec_l);
             if (n_dotl > 0) {
                 intensity += light->getIntensity() * n_dotl / (normal.norm() * vec_l.norm());
+            }
+
+            if (s != -1) {
+                Vector3d R = 2 * normal * normal.dot(vec_l);
+                double r_dot_v = R.dot(v);
+                if (r_dot_v > 0) {
+                    intensity += light->getIntensity() * std::pow(r_dot_v / (R.norm() * v.norm()), s);
+                }
             }
         }
     }

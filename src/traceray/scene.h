@@ -12,6 +12,7 @@ struct Sphere {
     int radius;
     Vector3d center;
     QColor color;
+    double specular;
 };
 
 class Scene {

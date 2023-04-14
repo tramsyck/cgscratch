@@ -23,6 +23,7 @@ void Scene::addSampleObject()
         sphere->center = Vector3d { 0, -1, 3 };
         sphere->radius = 1;
         sphere->color = Qt::red;
+        sphere->specular = 500;
         _objects.push_back(sphere);
     }
 
@@ -31,6 +32,7 @@ void Scene::addSampleObject()
         sphere->center = Vector3d { 2, 0, 4 };
         sphere->radius = 1;
         sphere->color = Qt::green;
+        sphere->specular = 500;
         _objects.push_back(sphere);
     }
 
@@ -39,6 +41,7 @@ void Scene::addSampleObject()
         sphere->center = Vector3d { -2, 0, 4 };
         sphere->radius = 1;
         sphere->color = Qt::blue;
+        sphere->specular = 10;
         _objects.push_back(sphere);
     }
     {
@@ -46,6 +49,7 @@ void Scene::addSampleObject()
         sphere->center = Vector3d { 0, -5001, 0 };
         sphere->radius = 5000;
         sphere->color = Qt::yellow;
+        sphere->specular = 1000;
         _objects.push_back(sphere);
     }
 }

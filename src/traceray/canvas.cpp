@@ -21,6 +21,37 @@ std::tuple<double, double> IntersectRaySphere(Vector3d origin, Vector3d directio
     return { t1, t2 };
 }
 
+QColor TraceRay(const Vector3d& origin, const Vector3d& direction, double min_t, double max_t, const Scene& scene)
+{
+    QColor color = Qt::black;
+    std::shared_ptr<Sphere> current_sphere = nullptr;
+    float closest_t = HUGE_VAL;
+    for (auto object : scene.getSpheres()) {
+        auto [t1, t2] = IntersectRaySphere(origin, direction, object);
+
+        if (closest_t > t1 && min_t < t1 && t1 < max_t) {
+            closest_t = t1;
+            current_sphere = object;
+        }
+        if (closest_t > t2 && min_t < t2 && t2 < max_t) {
+            closest_t = t2;
+            current_sphere = object;
+        }
+    }
+    if (current_sphere != nullptr) {
+
+        color = current_sphere->color;
+
+        auto point = closest_t * direction;
+        Vector3d normal0 = point - current_sphere->center;
+        Vector3d normal = (1.0 / normal0.norm()) * normal0;
+        auto intensity = tools::ComputeLighting(point, normal, -direction, current_sphere->specular, scene);
+        color = QColor::fromRgb(std::min<int>(255, color.red() * intensity),
+            std::min<int>(255, color.green() * intensity), std::min<int>(255, color.blue() * intensity));
+        return color;
+    }
+    return color;
+}
 Canvas::Canvas(int w, int h, const Viewport& viewport, const Scene& scene)
     : _image(w, h, QImage::Format_RGB32)
     , _viewport(viewport)
@@ -32,35 +63,8 @@ const QImage& Canvas::generate()
 {
     for (int i = -width() / 2; i < width() / 2; ++i) {
         for (int j = -height() / 2; j < height() / 2; ++j) {
-            QColor color = Qt::black;
             Vector3d direction = tools::CanvasToViewport(Vector2d { i, j }, *this);
-            std::shared_ptr<Sphere> current_sphere = nullptr;
-            float closest_t = HUGE_VAL;
-            for (auto object : _scene.getSpheres()) {
-                auto [t1, t2] = IntersectRaySphere(_cameraPostion, direction, object);
-
-                if (closest_t > t1) {
-                    closest_t = t1;
-                    current_sphere = object;
-                }
-                if (closest_t > t2) {
-                    closest_t = t2;
-                    current_sphere = object;
-                }
-            }
-            if (current_sphere != nullptr) {
-
-                color = current_sphere->color;
-
-                auto point = closest_t * direction;
-                Vector3d normal0 = point - current_sphere->center;
-                Vector3d normal = (1.0 / normal0.norm()) * normal0;
-                auto intensity = tools::ComputeLighting(point, normal, this->_scene);
-                color = QColor::fromRgb(std::min<int>(255, color.red() * intensity),
-                    std::min<int>(255, color.green() * intensity), std::min<int>(255, color.blue() * intensity));
-            } else {
-                color = Qt::black;
-            }
+            auto color = TraceRay(_cameraPostion, direction, 1, INFINITY, this->_scene);
             putPixel(i, j, color);
         }
     }
