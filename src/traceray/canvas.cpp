@@ -3,49 +3,20 @@
 #include <QDebug>
 
 using namespace tools;
-std::tuple<double, double> IntersectRaySphere(Vector3d origin, Vector3d direction, std::shared_ptr<Sphere> sphere)
-{
-    Vector3d oc = origin - sphere->center;
-    float a = direction.dot(direction);
-
-    float b = 2 * oc.dot(direction);
-    float c = oc.dot(oc) - sphere->radius * sphere->radius;
-    float descriminant = b * b - 4 * a * c;
-
-    if (descriminant < 0) {
-        return { INFINITY, INFINITY };
-    }
-
-    float t1 = (-b + std::sqrt(descriminant)) / (2 * a);
-    float t2 = (-b - std::sqrt(descriminant)) / (2 * a);
-    return { t1, t2 };
-}
 
 QColor TraceRay(const Vector3d& origin, const Vector3d& direction, double min_t, double max_t, const Scene& scene)
 {
     QColor color = Qt::black;
-    std::shared_ptr<Sphere> current_sphere = nullptr;
-    float closest_t = HUGE_VAL;
-    for (auto object : scene.getSpheres()) {
-        auto [t1, t2] = IntersectRaySphere(origin, direction, object);
 
-        if (closest_t > t1 && min_t < t1 && t1 < max_t) {
-            closest_t = t1;
-            current_sphere = object;
-        }
-        if (closest_t > t2 && min_t < t2 && t2 < max_t) {
-            closest_t = t2;
-            current_sphere = object;
-        }
-    }
-    if (current_sphere != nullptr) {
+    auto [closest_sphere, closest_t] = tools::ClosestIntersection(origin, direction, min_t, max_t, scene);
+    if (closest_sphere != nullptr) {
 
-        color = current_sphere->color;
+        color = closest_sphere->color;
 
         auto point = closest_t * direction;
-        Vector3d normal0 = point - current_sphere->center;
+        Vector3d normal0 = point - closest_sphere->center;
         Vector3d normal = (1.0 / normal0.norm()) * normal0;
-        auto intensity = tools::ComputeLighting(point, normal, -direction, current_sphere->specular, scene);
+        auto intensity = tools::ComputeLighting(point, normal, -direction, closest_sphere->specular, scene);
         color = QColor::fromRgb(std::min<int>(255, color.red() * intensity),
             std::min<int>(255, color.green() * intensity), std::min<int>(255, color.blue() * intensity));
         return color;
